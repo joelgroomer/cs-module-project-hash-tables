@@ -100,7 +100,28 @@ class HashTable:
         Implement this.
         """
         index = self.hash_index(key)
-        self.table[index] = value
+        if self.table[index] is None:
+            # if there were no entries at this index, add this one
+            self.table[index] = HashTableEntry(key, value)
+        else:
+            searching = True
+            found = False
+            entry = self.table[index]
+
+            while searching:
+                if entry.key == key:
+                    # if this entry has the same key, overwrite
+                    entry.value = value
+                    found = True
+                    searching = False
+                elif entry.next is None:
+                    searching = False
+                else:
+                    entry = entry.next
+
+            if not found:
+                # add new entry to the end of the linked list
+                entry.next = HashTableEntry(key, value)
 
     def delete(self, key):
         """
@@ -111,7 +132,32 @@ class HashTable:
         Implement this.
         """
         index = self.hash_index(key)
-        self.table[index] = None
+        if self.table[index] is not None:
+            searching = True
+            prev_entry = None
+            entry = self.table[index]
+
+            while searching:
+                if entry.key == key:
+                    # this is the entry we want to delete
+                    if prev_entry is not None:
+                        # link the previous entry to the next entry,
+                        # effectively dropping the current entry
+                        prev_entry.next = entry.next
+                    else:
+                        # if there's no previous entry, make the entry
+                        # after this one the first entry
+                        self.table[index] = entry.next
+                    return
+                elif entry.next is not None:
+                    # if this isn't the entry we're looking for, move on
+                    entry = entry.next
+                else:
+                    searching = False
+
+        # if we get here, the index was empty or the key wasn't found
+        print(
+            f"WARNING: Key '${key}'not found in hash table. Could not delete.")
 
     def get(self, key):
         """
@@ -122,7 +168,21 @@ class HashTable:
         Implement this.
         """
         index = self.hash_index(key)
-        return self.table[index]
+        if self.table[index] is None:
+            return None
+
+        searching = True
+        entry = self.table[index]
+
+        while searching:
+            if entry.key == key:
+                return entry.value
+            elif entry.next is not None:
+                entry = entry.next
+            else:
+                searching = False
+
+        return None
 
     def resize(self, new_capacity):
         """

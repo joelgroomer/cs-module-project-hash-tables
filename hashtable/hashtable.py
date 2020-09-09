@@ -164,7 +164,7 @@ class HashTable:
 
         # if we get here, the index was empty or the key wasn't found
         print(
-            f"WARNING: Key '${key}'not found in hash table. Could not delete.")
+            f"WARNING: Key '{key}'not found in hash table. Could not delete.")
 
     def get(self, key):
         """

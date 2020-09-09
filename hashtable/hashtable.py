@@ -22,6 +22,8 @@ class HashTable:
     """
 
     def __init__(self, capacity):
+        self.nodes = 0
+
         if capacity >= MIN_CAPACITY:
             self.capacity = capacity
         else:
@@ -47,7 +49,7 @@ class HashTable:
 
         Implement this.
         """
-        pass
+        return self.nodes / self.capacity
 
     def fnv1(self, key):
         """
@@ -103,6 +105,7 @@ class HashTable:
         if self.table[index] is None:
             # if there were no entries at this index, add this one
             self.table[index] = HashTableEntry(key, value)
+            self.nodes += 1
         else:
             searching = True
             found = False
@@ -122,6 +125,10 @@ class HashTable:
             if not found:
                 # add new entry to the end of the linked list
                 entry.next = HashTableEntry(key, value)
+                self.nodes += 1
+
+        if self.get_load_factor() > 0.7:
+            self.resize(self.capacity * 2)
 
     def delete(self, key):
         """
@@ -191,7 +198,21 @@ class HashTable:
 
         Implement this.
         """
-        pass
+
+        self.capacity = new_capacity
+        old_table = self.table
+        self.table = [None] * new_capacity
+
+        for node in old_table:
+            # loop through all of the indexes
+            if node is None:
+                continue
+
+            self.put(node.key, node.value)
+            while node.next is not None:
+                # loop through old linked list and add to new array
+                node = node.next
+                self.put(node.key, node.value)
 
 
 if __name__ == "__main__":
